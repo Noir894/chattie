@@ -1,340 +1,301 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chattie</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        h1 { color: white; font-size: 2.5rem; margin-bottom: 5px; letter-spacing: 2px; }
-        h1 span { color: #e94560; }
-        #subtitle { color: #aaa; margin-bottom: 20px; font-size: 14px; }
-        #status { color: #e94560; font-size: 16px; margin-bottom: 10px; font-weight: bold; }
-        #typing-indicator { color: #aaa; font-size: 13px; height: 20px; margin-bottom: 5px; font-style: italic; }
-        #main-container { display: flex; gap: 20px; align-items: flex-start; }
-        #video-container {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-        }
-        video {
-            width: 200px;
-            height: 150px;
-            border-radius: 10px;
-            background: #000;
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-        #local-video { border-color: #e94560; }
-        .video-label { color: #aaa; font-size: 12px; text-align: center; }
-        #chat-container {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 20px;
-            width: 550px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        #chat-box { 
-            height: 380px; overflow-y: scroll; padding: 10px; margin-bottom: 15px;
-            scrollbar-width: thin; scrollbar-color: #e94560 transparent;
-        }
-        #chat-box::-webkit-scrollbar { width: 4px; }
-        #chat-box::-webkit-scrollbar-thumb { background: #e94560; border-radius: 10px; }
-        .message { margin-bottom: 12px; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .message.tum { text-align: right; }
-        .message.stranger { text-align: left; }
-        .bubble {
-            display: inline-block; padding: 10px 15px; border-radius: 18px;
-            max-width: 75%; font-size: 14px; line-height: 1.4;
-        }
-        .tum .bubble { background: #e94560; color: white; border-bottom-right-radius: 4px; }
-        .stranger .bubble { background: rgba(255,255,255,0.15); color: white; border-bottom-left-radius: 4px; }
-        .system-msg { text-align: center; color: #aaa; font-size: 12px; margin: 8px 0; font-style: italic; }
-        .bubble img { max-width: 200px; max-height: 200px; border-radius: 10px; display: block; cursor: pointer; }
-        #input-area { display: flex; gap: 8px; align-items: center; }
-        #msg-input { 
-            flex: 1; padding: 12px 15px; border-radius: 25px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.1); color: white; font-size: 14px; outline: none;
-        }
-        #msg-input::placeholder { color: #aaa; }
-        #msg-input:focus { border-color: #e94560; }
-        .btn {
-            padding: 12px 16px; border-radius: 25px; border: none; 
-            cursor: pointer; font-size: 14px; font-weight: bold; transition: all 0.2s;
-        }
-        #send-btn { background: #e94560; color: white; }
-        #send-btn:hover { background: #c73652; transform: scale(1.05); }
-        #next-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
-        #next-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
-        #video-btn { background: #27ae60; color: white; }
-        #video-btn:hover { background: #219a52; transform: scale(1.05); }
-        #video-btn.active { background: #e94560; }
-        #emoji-btn, #img-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 12px; }
-        #emoji-btn:hover, #img-btn:hover { background: rgba(255,255,255,0.2); }
-        #emoji-picker {
-            display: none; background: rgba(255,255,255,0.1);
-            border-radius: 10px; padding: 10px; margin-top: 8px; font-size: 22px; cursor: pointer;
-        }
-        #emoji-picker span { padding: 3px; cursor: pointer; display: inline-block; }
-        #emoji-picker span:hover { transform: scale(1.3); display: inline-block; }
-        #bottom-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        #image-input { display: none; }
-    </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chattie</title>
+
+<style>
+body {
+    margin:0;
+    font-family:'Segoe UI';
+    background: linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+    color:white;
+}
+
+/* Container */
+#app {
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+}
+
+/* Header */
+#header {
+    text-align:center;
+    padding:10px;
+    font-size:18px;
+}
+
+/* Video */
+#video-container {
+    display:none;
+    justify-content:center;
+    gap:10px;
+}
+
+video {
+    width:45%;
+    border-radius:10px;
+}
+
+/* Chat */
+#chat-box {
+    flex:1;
+    overflow-y:auto;
+    padding:10px;
+}
+
+.msg {
+    margin:5px 0;
+}
+
+/* Input area */
+#input-area {
+    display:flex;
+    gap:5px;
+    padding:10px;
+}
+
+#msg-input {
+    flex:1;
+    padding:10px;
+    border-radius:20px;
+    border:none;
+}
+
+button {
+    padding:10px;
+    border:none;
+    border-radius:20px;
+}
+
+/* Bottom controls */
+#controls {
+    display:flex;
+    justify-content:space-around;
+    padding:5px;
+}
+
+/* Emoji */
+#emoji-box {
+    display:none;
+    padding:5px;
+    text-align:center;
+}
+
+#emoji-box span {
+    font-size:22px;
+    padding:5px;
+    cursor:pointer;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+    #chat-box {
+        max-width:600px;
+        margin:auto;
+    }
+}
+</style>
 </head>
+
 <body>
-    <h1>Chat<span>tie</span> 💬</h1>
-    <p id="subtitle">Talk to strangers, make friends!</p>
-    <div id="status">Connecting...</div>
-    <div id="typing-indicator"></div>
 
-    <div id="main-container">
-        <div id="video-container">
-            <div class="video-label">Tum</div>
-            <video id="local-video" autoplay muted playsinline></video>
-            <div class="video-label">Stranger</div>
-            <video id="remote-video" autoplay playsinline></video>
-        </div>
+<div id="app">
 
-        <div id="chat-container">
-            <div id="chat-box"></div>
-            <div id="input-area">
-                <button class="btn" id="emoji-btn" onclick="toggleEmoji()">😄</button>
-                <button class="btn" id="img-btn" onclick="document.getElementById('image-input').click()">🖼️</button>
-                <input type="file" id="image-input" accept="image/*"/>
-                <input id="msg-input" type="text" placeholder="Message likho..."/>
-                <button class="btn" id="send-btn" onclick="sendMessage()">Send 🚀</button>
-            </div>
-            <div id="emoji-picker">
-                <span>😀</span> <span>😂</span> <span>😍</span> <span>🥰</span> <span>😎</span>
-                <span>😭</span> <span>😅</span> <span>🤣</span> <span>😊</span> <span>😋</span>
-                <span>🤔</span> <span>😴</span> <span>🥳</span> <span>😡</span> <span>🤯</span>
-                <span>👍</span> <span>👎</span> <span>❤️</span> <span>🔥</span> <span>💯</span>
-                <span>🎉</span> <span>🙏</span> <span>💀</span> <span>👀</span> <span>😈</span>
-                <span>🤝</span> <span>💪</span> <span>🫡</span> <span>😏</span> <span>🥹</span>
-            </div>
-            <div id="bottom-bar">
-                <button class="btn" id="next-btn" onclick="nextStranger()">Next Stranger ⏭️</button>
-                <button class="btn" id="video-btn" onclick="toggleVideo()">📹 Video Call</button>
-            </div>
-        </div>
-    </div>
+<div id="header">Chattie 💬</div>
+<div id="status" style="text-align:center;"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script>
-        const socket = io();
-        let typingTimeout;
-        let localStream = null;
-        let peerConnection = null;
-        let isVideoOn = false;
+<div id="video-container">
+    <video id="local-video" autoplay muted></video>
+    <video id="remote-video" autoplay></video>
+</div>
 
-        const iceConfig = {
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-        };
+<div id="chat-box"></div>
 
-        socket.on('connect', () => {
-            socket.emit('join');
-        });
+<div id="emoji-box">
+    <span>😀</span><span>😂</span><span>😍</span><span>😎</span>
+    <span>🔥</span><span>❤️</span><span>👍</span><span>💀</span>
+</div>
 
-        socket.on('waiting', (data) => {
-            document.getElementById('status').innerText = data.msg;
-            addSystemMessage(data.msg);
-            stopVideo();
-        });
+<div id="input-area">
+    <input id="msg-input" placeholder="Message..." />
+    <button onclick="sendMessage()">➤</button>
+</div>
 
-        socket.on('connected', (data) => {
-            document.getElementById('status').innerText = data.msg;
-            addSystemMessage(data.msg);
-        });
+<div id="controls">
+    <button onclick="toggleEmoji()">😄</button>
+    <button onclick="document.getElementById('image-input').click()">🖼️</button>
+    <button onclick="toggleVideo()">📹</button>
+    <button onclick="nextStranger()">⏭️</button>
+    <button onclick="logout()">🚪</button>
+</div>
 
-        socket.on('message', (data) => {
-            addMessage(data.msg, data.user);
-        });
+<input type="file" id="image-input" style="display:none"/>
 
-        socket.on('image', (data) => {
-            addImage(data.img, data.user);
-        });
+</div>
 
-        socket.on('typing', () => {
-            document.getElementById('typing-indicator').innerText = '✍️ Stranger likh raha hai...';
-        });
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 
-        socket.on('stop_typing', () => {
-            document.getElementById('typing-indicator').innerText = '';
-        });
+<script>
+const socket = io();
 
-        socket.on('disconnected', (data) => {
-            document.getElementById('status').innerText = data.msg;
-            document.getElementById('typing-indicator').innerText = '';
-            addSystemMessage(data.msg);
-            stopVideo();
-        });
+let localStream=null;
+let peerConnection=null;
+let isVideoOn=false;
 
-        // WebRTC events
-        socket.on('webrtc_offer', async (data) => {
-            if (!peerConnection) createPeerConnection();
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-            socket.emit('webrtc_answer', answer);
-        });
+const config={ iceServers:[{urls:'stun:stun.l.google.com:19302'}] };
 
-        socket.on('webrtc_answer', async (data) => {
-            if (peerConnection) {
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
-            }
-        });
+socket.on('connect',()=> socket.emit('join'));
+socket.on('waiting',d=>status(d.msg));
+socket.on('connected',d=>status(d.msg));
 
-        socket.on('webrtc_ice', async (data) => {
-            if (peerConnection) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(data));
-            }
-        });
+socket.on('message',d=>addMessage(d.msg,d.user));
+socket.on('image',d=>addImage(d.img,d.user));
 
-        function createPeerConnection() {
-            peerConnection = new RTCPeerConnection(iceConfig);
+function status(msg){
+    document.getElementById('status').innerText=msg;
+}
 
-            if (localStream) {
-                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-            }
+function addMessage(msg,user){
+    const box=document.getElementById('chat-box');
+    const div=document.createElement('div');
+    div.className='msg';
+    div.innerText=user+": "+msg;
+    box.appendChild(div);
+    box.scrollTop=box.scrollHeight;
+}
 
-            peerConnection.ontrack = (event) => {
-                document.getElementById('remote-video').srcObject = event.streams[0];
-            };
+function addImage(img,user){
+    const box=document.getElementById('chat-box');
+    const div=document.createElement('div');
+    div.className='msg';
 
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socket.emit('webrtc_ice', event.candidate);
-                }
-            };
-        }
+    const image=document.createElement('img');
+    image.src=img;
+    image.style.width="150px";
 
-        async function toggleVideo() {
-            if (!isVideoOn) {
-                try {
-                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    document.getElementById('local-video').srcObject = localStream;
-                    document.getElementById('video-container').style.display = 'flex';
-                    document.getElementById('video-btn').innerText = '🔴 Call Band Karo';
-                    document.getElementById('video-btn').classList.add('active');
-                    isVideoOn = true;
+    div.append(user+": ");
+    div.appendChild(image);
 
-                    createPeerConnection();
-                    const offer = await peerConnection.createOffer();
-                    await peerConnection.setLocalDescription(offer);
-                    socket.emit('webrtc_offer', offer);
-                    addSystemMessage('Video call shuru ho gayi! 📹');
-                } catch (err) {
-                    addSystemMessage('Camera permission do! ❌');
-                }
-            } else {
-                stopVideo();
-            }
-        }
+    box.appendChild(div);
+    box.scrollTop=box.scrollHeight;
+}
 
-        function stopVideo() {
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            if (peerConnection) {
-                peerConnection.close();
-                peerConnection = null;
-            }
-            document.getElementById('local-video').srcObject = null;
-            document.getElementById('remote-video').srcObject = null;
-            document.getElementById('video-container').style.display = 'none';
-            document.getElementById('video-btn').innerText = '📹 Video Call';
-            document.getElementById('video-btn').classList.remove('active');
-            isVideoOn = false;
-        }
+function sendMessage(){
+    const input=document.getElementById('msg-input');
+    const msg=input.value.trim();
+    if(!msg) return;
 
-        function addMessage(msg, user) {
-            const box = document.getElementById('chat-box');
-            const div = document.createElement('div');
-            div.className = `message ${user === 'Tum' ? 'tum' : 'stranger'}`;
-            div.innerHTML = `<span class="bubble">${msg}</span>`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
+    socket.emit('message',{msg});
+    input.value='';
+}
 
-        function addImage(imgData, user) {
-            const box = document.getElementById('chat-box');
-            const div = document.createElement('div');
-            div.className = `message ${user === 'Tum' ? 'tum' : 'stranger'}`;
-            div.innerHTML = `<span class="bubble"><img src="${imgData}" onclick="window.open('${imgData}')"/></span>`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
+function nextStranger(){
+    document.getElementById('chat-box').innerHTML='';
+    stopVideo();
+    socket.emit('next');
+}
 
-        function addSystemMessage(msg) {
-            const box = document.getElementById('chat-box');
-            const div = document.createElement('div');
-            div.className = 'system-msg';
-            div.innerText = msg;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
+function logout(){
+    window.location.href="/logout";
+}
 
-        function sendMessage() {
-            const msg = document.getElementById('msg-input').value.trim();
-            if (!msg) return;
-            socket.emit('message', { msg: msg });
-            document.getElementById('msg-input').value = '';
-        }
+/* Emoji */
+function toggleEmoji(){
+    const box=document.getElementById('emoji-box');
+    box.style.display=box.style.display==="none"?"block":"none";
+}
 
-        function nextStranger() {
-            document.getElementById('chat-box').innerHTML = '';
-            stopVideo();
-            socket.emit('next');
-        }
+document.getElementById('emoji-box').onclick=e=>{
+    if(e.target.tagName==="SPAN"){
+        document.getElementById('msg-input').value+=e.target.innerText;
+    }
+};
 
-        function toggleEmoji() {
-            const picker = document.getElementById('emoji-picker');
-            picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
-        }
+/* Image */
+document.getElementById('image-input').addEventListener('change',e=>{
+    const file=e.target.files[0];
+    if(!file) return;
 
-        document.getElementById('emoji-picker').addEventListener('click', (e) => {
-            if (e.target.tagName === 'SPAN') {
-                document.getElementById('msg-input').value += e.target.innerText;
-                document.getElementById('msg-input').focus();
-                document.getElementById('emoji-picker').style.display = 'none';
-            }
-        });
+    const reader=new FileReader();
+    reader.onload=evt=>{
+        socket.emit('image',{img:evt.target.result});
+        addImage(evt.target.result,"Tum");
+    };
+    reader.readAsDataURL(file);
+});
 
-        document.getElementById('image-input').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                socket.emit('image', { img: evt.target.result });
-                addImage(evt.target.result, 'Tum');
-            };
-            reader.readAsDataURL(file);
-            e.target.value = '';
-        });
+/* Video */
+function createPeer(){
+    peerConnection=new RTCPeerConnection(config);
 
-        document.getElementById('msg-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+    if(localStream){
+        localStream.getTracks().forEach(t=>peerConnection.addTrack(t,localStream));
+    }
 
-        document.getElementById('msg-input').addEventListener('input', () => {
-            socket.emit('typing');
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                socket.emit('stop_typing');
-            }, 1000);
-        });
-    </script>
+    peerConnection.ontrack=e=>{
+        document.getElementById('remote-video').srcObject=e.streams[0];
+    };
+
+    peerConnection.onicecandidate=e=>{
+        if(e.candidate) socket.emit('webrtc_ice',e.candidate);
+    };
+}
+
+async function toggleVideo(){
+    if(!isVideoOn){
+        localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+        document.getElementById('video-container').style.display='flex';
+        document.getElementById('local-video').srcObject=localStream;
+
+        createPeer();
+
+        const offer=await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        socket.emit('webrtc_offer',offer);
+
+        isVideoOn=true;
+    }else{
+        stopVideo();
+    }
+}
+
+function stopVideo(){
+    if(localStream){
+        localStream.getTracks().forEach(t=>t.stop());
+        localStream=null;
+    }
+
+    if(peerConnection){
+        peerConnection.close();
+        peerConnection=null;
+    }
+
+    document.getElementById('video-container').style.display='none';
+    isVideoOn=false;
+}
+
+/* WebRTC */
+socket.on('webrtc_offer', async d=>{
+    createPeer();
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(d));
+
+    const answer=await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+
+    socket.emit('webrtc_answer',answer);
+});
+
+socket.on('webrtc_answer', async d=>{
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(d));
+});
+
+socket.on('webrtc_ice', async d=>{
+    await peerConnection.addIceCandidate(new RTCIceCandidate(d));
+});
+</script>
+
 </body>
 </html>
